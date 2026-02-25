@@ -13,19 +13,23 @@ const pulse = {
 const tile =
   'rounded-lg border border-white/20 bg-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white';
 
+const boardSizeClass = 'w-full h-[17rem] md:h-[19rem]';
+
 function GenericBoard({
   title,
   subtitle,
   chips,
+  analogy,
   tone = 'from-neutral-800 via-neutral-700 to-neutral-800',
 }: {
   title: string;
   subtitle: string;
   chips: string[];
+  analogy: string;
   tone?: string;
 }) {
   return (
-    <div className={`w-full h-52 rounded-xl bg-gradient-to-br ${tone} border border-white/20 p-4 overflow-hidden`}>
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br ${tone} border border-white/20 p-4 overflow-hidden relative`}>
       <div className="text-white">
         <p className="text-xs font-black uppercase tracking-[0.18em] opacity-80">Schiță Dinamo</p>
         <h4 className="text-sm md:text-base font-black leading-tight">{title}</h4>
@@ -45,13 +49,16 @@ function GenericBoard({
           </motion.div>
         ))}
       </div>
+      <p className="mt-3 text-[11px] text-white/90 italic leading-snug">
+        Analogie Dinamo: {analogy}
+      </p>
     </div>
   );
 }
 
-function TimelineBoard({ steps, color }: { steps: string[]; color: string }) {
+function TimelineBoard({ steps, color, analogy }: { steps: string[]; color: string; analogy: string }) {
   return (
-    <div className="w-full h-52 rounded-xl bg-neutral-900 border border-neutral-700 p-4 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-neutral-900 border border-neutral-700 p-4 overflow-hidden relative`}>
       <div className="flex items-center gap-2 mb-4">
         <div className={`w-2 h-2 rounded-full ${color}`} />
         <p className="text-white text-xs font-black uppercase tracking-[0.18em]">Flux Executie</p>
@@ -79,6 +86,9 @@ function TimelineBoard({ steps, color }: { steps: string[]; color: string }) {
           ))}
         </div>
       </div>
+      <p className="mt-3 text-[11px] text-white/80 italic leading-snug">
+        Analogie Dinamo: {analogy}
+      </p>
     </div>
   );
 }
@@ -86,16 +96,18 @@ function TimelineBoard({ steps, color }: { steps: string[]; color: string }) {
 function LayeredSchemaBoard({
   title,
   layers,
+  analogy,
   tone = 'from-slate-900 via-slate-800 to-slate-900',
 }: {
   title: string;
   layers: string[];
+  analogy: string;
   tone?: string;
 }) {
   return (
-    <div className={`w-full h-52 rounded-xl bg-gradient-to-br ${tone} border border-white/20 p-3 overflow-hidden`}>
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br ${tone} border border-white/20 p-3 overflow-hidden relative`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">{title}</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-48px)]">
         {layers.map((layer, index) => {
           const top = 8 + index * 38;
           return (
@@ -124,15 +136,18 @@ function LayeredSchemaBoard({
           );
         })}
       </div>
+      <p className="mt-2 text-[11px] text-white/85 italic leading-snug">
+        Analogie Dinamo: {analogy}
+      </p>
     </div>
   );
 }
 
 function JoinVennBoard() {
   return (
-    <div className="w-full h-52 rounded-xl bg-neutral-900 border border-neutral-700 p-3 overflow-hidden relative">
+    <div className={`${boardSizeClass} rounded-xl bg-neutral-900 border border-neutral-700 p-3 overflow-hidden relative`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">JOIN Schema (SQL)</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         <motion.div
           animate={{ x: [0, -2, 0] }}
           transition={{ duration: 2.4, repeat: Infinity }}
@@ -149,15 +164,18 @@ function JoinVennBoard() {
         <div className="absolute left-[16%] bottom-[8%] text-[10px] font-bold text-cyan-200">LEFT = tot Users + match</div>
         <div className="absolute right-[8%] bottom-[8%] text-[10px] font-bold text-emerald-200 text-right">RIGHT = tot Orders + match</div>
       </div>
+      <p className="mt-2 text-[11px] text-white/80 italic leading-snug">
+        Analogie Dinamo: faci selecția lotului ca la matchup-ul de derby — uneori iei doar jucătorii care se potrivesc perfect, alteori păstrezi toată echipa de bază și completezi ce lipsește.
+      </p>
     </div>
   );
 }
 
 function CloudStackBoard() {
   return (
-    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-sky-900 via-blue-800 to-sky-900 border border-white/20 p-3 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br from-sky-900 via-blue-800 to-sky-900 border border-white/20 p-3 overflow-hidden`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Cloud Service Models</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         <div className="absolute inset-x-4 bottom-1 h-8 rounded-md bg-slate-900/70 border border-white/20 text-[11px] text-white font-bold flex items-center justify-center">
           IaaS — VM/Network/Storage control
         </div>
@@ -167,17 +185,19 @@ function CloudStackBoard() {
         <div className="absolute inset-x-12 bottom-[84px] h-8 rounded-md bg-cyan-600/75 border border-white/20 text-[11px] text-white font-bold flex items-center justify-center">
           SaaS — consumi produsul final
         </div>
-        <div className="absolute right-3 top-2 text-[10px] text-white/90 font-bold uppercase">Dinamo scale mode ⚽</div>
       </div>
+      <p className="mt-2 text-[11px] text-white/85 italic leading-snug">
+        Analogie Dinamo: când vine derby-ul ai nevoie de stadion mai mare și staff extins — exact așa scalezi de la IaaS la PaaS/SaaS în funcție de cât control și câtă viteză îți trebuie.
+      </p>
     </div>
   );
 }
 
 function LoopBoard({ title, nodes }: { title: string; nodes: string[] }) {
   return (
-    <div className="w-full h-52 rounded-xl bg-neutral-900 border border-neutral-700 p-3 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-neutral-900 border border-neutral-700 p-3 overflow-hidden`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">{title}</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         {nodes.map((node, index) => {
           const angle = (index / nodes.length) * Math.PI * 2;
           const left = 50 + Math.cos(angle) * 28;
@@ -204,17 +224,20 @@ function LoopBoard({ title, nodes }: { title: string; nodes: string[] }) {
           ↻
         </motion.div>
       </div>
+      <p className="mt-2 text-[11px] text-white/80 italic leading-snug">
+        Analogie Dinamo: e antrenamentul repetitiv al aceleiași faze până când execuția devine naturală, fără greșeli.
+      </p>
     </div>
   );
 }
 
 function AngularBoard({ advanced = false }: { advanced?: boolean }) {
   return (
-    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-red-900 via-rose-800 to-red-900 border border-white/20 p-3 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br from-red-900 via-rose-800 to-red-900 border border-white/20 p-3 overflow-hidden`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">
         {advanced ? 'Angular Advanced Match Plan' : 'Angular Team Formation'}
       </p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         <div className="absolute left-3 right-3 top-2 rounded-md border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase">
           App Shell + Routing Guards
         </div>
@@ -235,21 +258,19 @@ function AngularBoard({ advanced = false }: { advanced?: boolean }) {
         <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.2 }} className="absolute left-[27%] top-20 text-white/80 text-xs">↓</motion.div>
         <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.35 }} className="absolute right-[27%] top-20 text-white/80 text-xs">↓</motion.div>
         <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.5 }} className="absolute left-1/2 -translate-x-1/2 top-32 text-white/80 text-xs">↓</motion.div>
-        {advanced && (
-          <div className="absolute right-2 top-1 text-[9px] font-black uppercase text-amber-200 bg-black/30 border border-white/20 rounded px-1.5 py-0.5">
-            OnPush + Perf
-          </div>
-        )}
       </div>
+      <p className="mt-2 text-[11px] text-white/85 italic leading-snug">
+        Analogie Dinamo: fiecare compartiment joacă pe post fix — fundașii nu urcă aiurea, iar pasele circulă controlat; exact asta face arhitectura Angular când separi clar UI, logică și state.
+      </p>
     </div>
   );
 }
 
 function KafkaFlowBoard() {
   return (
-    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-violet-900 via-purple-800 to-violet-900 border border-white/20 p-3 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br from-violet-900 via-purple-800 to-violet-900 border border-white/20 p-3 overflow-hidden`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Event-Driven (Kafka) Match Radio</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         <div className="absolute left-2 top-12 w-[28%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">API Producer</div>
         <div className="absolute left-[36%] top-6 w-[28%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Kafka Topic</div>
         <div className="absolute right-2 top-12 w-[28%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Consumer Service</div>
@@ -259,15 +280,18 @@ function KafkaFlowBoard() {
         <motion.div animate={{ x: [0, 8, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.4, delay: 0.3 }} className="absolute left-[65%] top-14 text-white">→</motion.div>
         <motion.div animate={{ y: [0, 6, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.6, delay: 0.2 }} className="absolute left-1/2 -translate-x-1/2 top-16 text-white">↓</motion.div>
       </div>
+      <p className="mt-2 text-[11px] text-white/85 italic leading-snug">
+        Analogie Dinamo: ca stația radio dintre compartimente — antrenorul transmite faza, fiecare linie reacționează când primește semnalul.
+      </p>
     </div>
   );
 }
 
 function DevOpsToolchainBoard() {
   return (
-    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-amber-900 via-orange-800 to-amber-900 border border-white/20 p-3 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br from-amber-900 via-orange-800 to-amber-900 border border-white/20 p-3 overflow-hidden`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Toolchain Delivery Line</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         {['Bitbucket/GitHub', 'Bamboo CI', 'Spinnaker CD', 'Jira Tracking'].map((item, idx) => (
           <motion.div
             key={item}
@@ -282,15 +306,18 @@ function DevOpsToolchainBoard() {
         ))}
         <motion.div animate={{ x: [0, 78, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 2.8 }} className="absolute left-8 bottom-3 text-white">⚽➡</motion.div>
       </div>
+      <p className="mt-2 text-[11px] text-white/85 italic leading-snug">
+        Analogie Dinamo: drumul de la antrenament la meci oficial — fiecare pas validat, altfel nu intri pe teren.
+      </p>
     </div>
   );
 }
 
 function MCPBoard() {
   return (
-    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-fuchsia-900 via-purple-800 to-fuchsia-900 border border-white/20 p-3 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br from-fuchsia-900 via-purple-800 to-fuchsia-900 border border-white/20 p-3 overflow-hidden`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">MCP + Agentic Workflow</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         <div className="absolute left-2 top-8 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Developer Prompt</div>
         <div className="absolute left-[35%] top-2 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">MCP Context Hub</div>
         <div className="absolute right-2 top-8 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Agents/Tools</div>
@@ -300,15 +327,18 @@ function MCPBoard() {
         <motion.div animate={{ x: [0, 8, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.4, delay: 0.2 }} className="absolute left-[67%] top-10 text-white">→</motion.div>
         <motion.div animate={{ y: [0, 6, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.4 }} className="absolute left-1/2 -translate-x-1/2 top-16 text-white">↓</motion.div>
       </div>
+      <p className="mt-2 text-[11px] text-white/85 italic leading-snug">
+        Analogie Dinamo: ai antrenori specializați pe faze diferite, dar decizia finală rămâne la principal — human-in-the-loop.
+      </p>
     </div>
   );
 }
 
 function ConstructionImpactBoard() {
   return (
-    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-slate-900 via-stone-800 to-slate-900 border border-white/20 p-3 overflow-hidden">
+    <div className={`${boardSizeClass} rounded-xl bg-gradient-to-br from-slate-900 via-stone-800 to-slate-900 border border-white/20 p-3 overflow-hidden`}>
       <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Construction Domain Impact</p>
-      <div className="relative h-[calc(100%-22px)]">
+      <div className="relative h-[calc(100%-44px)]">
         <div className="absolute left-2 top-6 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Site Data</div>
         <div className="absolute left-[35%] top-6 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">API + Rules</div>
         <div className="absolute right-2 top-6 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Field UI</div>
@@ -317,6 +347,9 @@ function ConstructionImpactBoard() {
         <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.6, delay: 0.2 }} className="absolute left-[66%] top-10 text-white">→</motion.div>
         <motion.div animate={{ y: [0, 6, 0], opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.3 }} className="absolute left-1/2 -translate-x-1/2 top-16 text-white">↓</motion.div>
       </div>
+      <p className="mt-2 text-[11px] text-white/85 italic leading-snug">
+        Analogie Dinamo: datele din teren, tactica și execuția pe gazon trebuie să fie aliniate, altfel pierzi puncte reale, nu doar „frumusețe” în cod.
+      </p>
     </div>
   );
 }
@@ -326,7 +359,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'error-types':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <div className="relative h-52 bg-gradient-to-br from-green-900 to-emerald-700 border-4 border-white rounded-xl p-3">
+          <div className="relative h-[17rem] md:h-[19rem] bg-gradient-to-br from-green-900 to-emerald-700 border-4 border-white rounded-xl p-3">
             <div className="absolute inset-x-0 top-1/2 h-px bg-white/25" />
             <motion.div
               initial={{ x: -40, opacity: 0 }}
@@ -352,6 +385,9 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             >
               Logical + Warnings
             </motion.div>
+            <p className="absolute bottom-3 right-3 max-w-[60%] text-[11px] text-white/90 italic leading-snug text-right">
+              Analogie Dinamo: intrarea pe stadion, accidentarea din timpul meciului și autogolul sunt etape diferite ale aceleiași partide.
+            </p>
           </div>
         </div>
       );
@@ -359,7 +395,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'memory-flow':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <div className="h-52 grid grid-cols-3 gap-3 p-3 bg-slate-100 border border-slate-300 rounded-xl">
+          <div className="h-[17rem] md:h-[19rem] grid grid-cols-3 gap-3 p-3 bg-slate-100 border border-slate-300 rounded-xl">
             <div className="col-span-1 rounded-lg bg-slate-800 p-2 flex flex-col-reverse gap-2">
               {[1, 2, 3].map((i) => (
                 <motion.div
@@ -387,6 +423,9 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
                   Obj
                 </motion.div>
               ))}
+              <p className="absolute bottom-2 right-2 text-[11px] text-emerald-950 italic text-right leading-snug max-w-[72%]">
+                Analogie Dinamo: banca de rezerve e ordonată (stack), terenul mare e pentru toți jucătorii activi (heap).
+              </p>
             </div>
           </div>
         </div>
@@ -395,7 +434,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'gc-arena':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <div className="relative h-52 rounded-xl bg-gradient-to-br from-emerald-900 via-green-700 to-emerald-900 border border-white/20 p-3 overflow-hidden">
+          <div className="relative h-[17rem] md:h-[19rem] rounded-xl bg-gradient-to-br from-emerald-900 via-green-700 to-emerald-900 border border-white/20 p-3 overflow-hidden">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-white/90 mb-2">Garbage Collection Arena</p>
             {[1, 2, 3, 4].map((i) => (
               <motion.div
@@ -430,6 +469,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
           <TimelineBoard
             color="bg-red-600"
             steps={['Breakpoint', 'Watch/Inspect', 'Call Stack', 'Try/Catch', 'Log & Fix']}
+            analogy="Ca la analiza video după derby: oprești faza, te uiți pe cadre, corectezi schema și revii mai pregătit."
           />
         </div>
       );
@@ -437,7 +477,8 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'oop-core':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <div className="h-52 bg-slate-100 border border-slate-300 rounded-xl p-4 flex items-center justify-around">
+          <div className="h-[17rem] md:h-[19rem] bg-slate-100 border border-slate-300 rounded-xl p-4 flex flex-col justify-between">
+            <div className="flex items-center justify-around">
             <div className="text-center">
               <div className="w-24 h-28 rounded-lg border-2 border-dashed border-blue-500 bg-blue-100 flex items-center justify-center text-3xl">
                 📘
@@ -457,6 +498,10 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
               </motion.div>
               <p className="text-[11px] font-black mt-1">Object</p>
             </div>
+            </div>
+            <p className="text-[11px] text-slate-700 italic text-center leading-snug">
+              Analogie Dinamo: fișa postului definește rolul, jucătorul intrat în teren este instanța reală care execută.
+            </p>
           </div>
         </div>
       );
@@ -472,6 +517,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
               'Inheritance / Composition (structură) ',
               'Polymorphism (runtime behavior) ',
             ]}
+            analogy="Compartimentele joacă disciplinat: fundașii țin linia, mijlocașii distribuie, iar atacanții finalizează după aceeași strategie de echipă."
             tone="from-indigo-900 via-indigo-700 to-slate-800"
           />
         </div>
@@ -484,6 +530,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Composition vs Aggregation · Interface Contract"
             subtitle="has-a, coupling/cohesion, dependency control"
             chips={['has-a', 'is-a', 'cohesion↑', 'coupling↓', 'interface', 'abstract class']}
+            analogy="Echipa are-antrenor și are-staff: relațiile bune în vestiar evită dependențele toxice și haosul tactic."
             tone="from-violet-900 via-fuchsia-700 to-violet-900"
           />
         </div>
@@ -496,6 +543,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="SOLID Defensive Line"
             subtitle="SRP · OCP · LSP · ISP · DIP"
             chips={['SRP', 'OCP', 'LSP', 'ISP', 'DIP']}
+            analogy="Fiecare fundaș își ține zona; dacă unul joacă haotic, toată linia defensivă se rupe."
             tone="from-red-900 via-rose-700 to-red-900"
           />
         </div>
@@ -508,6 +556,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Creational Patterns"
             subtitle="Factory · Singleton · Builder"
             chips={['Factory', 'Singleton', 'Builder']}
+            analogy="Academia produce jucători la cerere, căpitanul rămâne unic, iar lotul complex se construiește pas cu pas."
             tone="from-amber-900 via-orange-700 to-amber-900"
           />
         </div>
@@ -520,6 +569,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Behavioral + Structural"
             subtitle="Strategy · Observer · Adapter · Decorator · Repository · DI"
             chips={['Strategy', 'Observer', 'Adapter', 'Decorator', 'Repository', 'DI Pattern']}
+            analogy="Schimbi tactica în minutul 80, anunți instant banca și adaptezi limbajul dintre compartimente fără să schimbi identitatea echipei."
             tone="from-sky-900 via-cyan-700 to-sky-900"
           />
         </div>
@@ -532,6 +582,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Anti-pattern Alert"
             subtitle="God Object · Spaghetti Code"
             chips={['Too many responsibilities', 'Low testability', 'Hard changes', 'Hidden bugs']}
+            analogy="Dacă un singur jucător vrea să fie portar, fundaș și atacant simultan, meciul e pierdut tactic din primul sfert de oră."
             tone="from-zinc-900 via-zinc-700 to-zinc-900"
           />
         </div>
@@ -540,13 +591,18 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'testing-pyramid':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <div className="h-52 rounded-xl bg-neutral-900 border border-neutral-700 p-4">
+          <div className="h-[17rem] md:h-[19rem] rounded-xl bg-neutral-900 border border-neutral-700 p-4 flex flex-col justify-between">
+            <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-white mb-3">Testing Pyramid</p>
             <div className="space-y-2">
               <motion.div initial={{ width: 0 }} animate={{ width: '35%' }} transition={{ duration: 0.6 }} className="h-8 bg-cyan-500/80 rounded-md text-[11px] font-black text-white flex items-center px-2">E2E</motion.div>
               <motion.div initial={{ width: 0 }} animate={{ width: '58%' }} transition={{ duration: 0.7 }} className="h-8 bg-blue-500/80 rounded-md text-[11px] font-black text-white flex items-center px-2">Integration</motion.div>
               <motion.div initial={{ width: 0 }} animate={{ width: '88%' }} transition={{ duration: 0.8 }} className="h-8 bg-emerald-500/80 rounded-md text-[11px] font-black text-white flex items-center px-2">Unit</motion.div>
             </div>
+            </div>
+            <p className="text-[11px] text-white/80 italic leading-snug">
+              Analogie Dinamo: multe exerciții de bază în antrenament, mai puține jocuri de compartiment și foarte puține finale complete.
+            </p>
           </div>
         </div>
       );
@@ -557,6 +613,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
           <TimelineBoard
             color="bg-emerald-500"
             steps={['Arrange', 'Act', 'Assert', 'Mock/Stub/Fake', 'Regression']}
+            analogy="E rutina de antrenament: pregătești faza, o execuți, verifici rezultatul și revii pe aceleași scheme după fiecare meci."
           />
         </div>
       );
@@ -568,6 +625,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="When NOT to Unit Test"
             subtitle="Testezi după risc, nu după ego"
             chips={['Trivial code', 'Low business value', 'High maintenance tests', 'Prefer integration where needed']}
+            analogy="Nu exersezi penalty-uri când problema reală e apărarea la cornere — prioritizezi unde pierzi puncte."
             tone="from-emerald-900 via-teal-700 to-emerald-900"
           />
         </div>
@@ -579,6 +637,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
           <TimelineBoard
             color="bg-sky-500"
             steps={['Client', 'HTTP Request', 'Server', 'HTTP Response', 'Render UI']}
+            analogy="Suporterul cere bilet la ghișeu, primește răspunsul oficial și intră pe stadion dacă totul e valid."
           />
         </div>
       );
@@ -590,6 +649,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Methods + Status Codes"
             subtitle="GET POST PUT PATCH DELETE | 200 201 400 401 403 404 409 500"
             chips={['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'Idempotency']}
+            analogy="Arbitrul arată cartonașul corect pentru fiecare fază: decizia contează la fel de mult ca faza în sine."
             tone="from-blue-900 via-sky-700 to-blue-900"
           />
         </div>
@@ -602,6 +662,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="REST + Stateless"
             subtitle="Resurse clare, contracte uniforme, cereri independente"
             chips={['Resource URIs', 'Uniform verbs', 'Stateless', 'Cache-friendly']}
+            analogy="Arbitrul judecă fiecare fază pe ce vede în acel moment, nu pe memoria meciurilor trecute."
             tone="from-cyan-900 via-cyan-700 to-slate-900"
           />
         </div>
@@ -624,7 +685,11 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'backend-pipeline':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-violet-500" steps={['Routing', 'Controller', 'Service', 'Repository', 'Response DTO']} />
+          <TimelineBoard
+            color="bg-violet-500"
+            steps={['Routing', 'Controller', 'Service', 'Repository', 'Response DTO']}
+            analogy="Mingea trece prin compartimente clare până ajunge finalizarea — dacă sari un compartiment, faza devine haotică."
+          />
         </div>
       );
 
@@ -641,6 +706,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
           <LayeredSchemaBoard
             title="Backend Architecture Schema"
             layers={['Middleware/Filters', 'Controller + DTO', 'Service Layer', 'Repository Layer', 'DB/External systems']}
+            analogy="Turnicheții filtrează intrarea, antrenorul decide tactica, arhiva clubului livrează datele oficiale."
             tone="from-fuchsia-900 via-violet-700 to-fuchsia-900"
           />
         </div>
@@ -653,6 +719,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="DI + Service Lifetimes"
             subtitle="Transient · Scoped · Singleton + Env Config"
             chips={['Dependency Injection', 'Transient', 'Scoped', 'Singleton', 'Dev/Test/Prod', 'Configuration']}
+            analogy="Magazionerul îți dă echipamentul potrivit pentru fiecare meci: uneori nou la fiecare fază, alteori același pe tot meciul."
             tone="from-purple-900 via-indigo-700 to-purple-900"
           />
         </div>
@@ -665,6 +732,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="SQL Fundamentals"
             subtitle="Table · Row · Column · PK · FK · Constraints · Index"
             chips={['Relational DB', 'Primary Key', 'Foreign Key', 'Constraints', 'Index', 'Schema']}
+            analogy="Fiecare jucător are număr unic pe tricou, iar legătura cu echipa se face prin legitimația oficială."
             tone="from-lime-900 via-emerald-700 to-lime-900"
           />
         </div>
@@ -680,7 +748,11 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'sql-acid':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-green-500" steps={['BEGIN', 'ACID checks', 'SELECT/INSERT/UPDATE/DELETE', 'COMMIT / ROLLBACK']} />
+          <TimelineBoard
+            color="bg-green-500"
+            steps={['BEGIN', 'ACID checks', 'SELECT/INSERT/UPDATE/DELETE', 'COMMIT / ROLLBACK']}
+            analogy="Transferul e valid doar dacă toate semnăturile și verificările trec; altfel revii la starea inițială."
+          />
         </div>
       );
 
@@ -691,6 +763,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="SQL vs NoSQL"
             subtitle="Schema strictă vs Schema-less document model"
             chips={['Collection', 'Document', 'Schema-less', 'Flexible fields', 'Trade-offs']}
+            analogy="Uneori joci pe stadion clasic cu reguli fixe, alteori pe teren modular unde schema se adaptează jocului."
             tone="from-orange-900 via-amber-700 to-orange-900"
           />
         </div>
@@ -699,14 +772,22 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'consistency-wave':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-amber-500" steps={['Write', 'Replica sync', 'Eventual consistency', 'Read convergence']} />
+          <TimelineBoard
+            color="bg-amber-500"
+            steps={['Write', 'Replica sync', 'Eventual consistency', 'Read convergence']}
+            analogy="Mesajul din vestiar ajunge întâi la staff, apoi la toată echipa; alinierea completă vine după câteva secunde."
+          />
         </div>
       );
 
     case 'async-lane':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-teal-500" steps={['Task created', 'await', 'non-blocking wait', 'resume', 'result']} />
+          <TimelineBoard
+            color="bg-teal-500"
+            steps={['Task created', 'await', 'non-blocking wait', 'resume', 'result']}
+            analogy="Nu ții toată echipa pe loc pentru un singur duel; ceilalți continuă jocul până vine mingea înapoi."
+          />
         </div>
       );
 
@@ -717,6 +798,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Concurrency Risks"
             subtitle="Race condition · Deadlock · Thread safety"
             chips={['Shared state', 'Race condition', 'Lock ordering', 'Deadlock', 'Thread-safe design']}
+            analogy="Doi jucători atacă aceeași minge fără comunicare și faza se rupe — exact ca accesul concurent fără sincronizare."
             tone="from-teal-900 via-cyan-700 to-teal-900"
           />
         </div>
@@ -729,6 +811,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Data Structures + Flow"
             subtitle="Arrays · Lists · Dictionaries/Maps · Loops · Conditionals"
             chips={['Array', 'List', 'Dictionary/Map', 'for/while', 'if/switch']}
+            analogy="Ai formulă de start fixă, bancă flexibilă și tabel de numere-tricou pentru lookup rapid în timpul meciului."
             tone="from-rose-900 via-red-700 to-rose-900"
           />
         </div>
@@ -741,6 +824,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Big O Race"
             subtitle="Sorting + Searching + Time/Space complexity"
             chips={['O(1)', 'O(log n)', 'O(n)', 'O(n log n)', 'O(n²)', 'Readability vs performance']}
+            analogy="Schema care consumă prea multă energie te lasă fără benzină după minutul 70, chiar dacă a arătat bine la început."
             tone="from-red-900 via-pink-700 to-red-900"
           />
         </div>
@@ -753,6 +837,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Edge Cases Defense"
             subtitle="Input validation înainte să intre datele în sistem"
             chips={['null/empty', 'min/max', 'invalid format', 'fail fast']}
+            analogy="Controlul biletelor la intrare oprește problemele înainte să ajungă în tribună."
             tone="from-stone-900 via-zinc-700 to-stone-900"
           />
         </div>
@@ -761,7 +846,11 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'git-graph':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-orange-500" steps={['branch', 'commit', 'pull request', 'code review', 'merge']} />
+          <TimelineBoard
+            color="bg-orange-500"
+            steps={['branch', 'commit', 'pull request', 'code review', 'merge']}
+            analogy="Antrenamentul din lotul secund devine meci oficial doar după analiza staff-ului tehnic."
+          />
         </div>
       );
 
@@ -775,7 +864,11 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'devops-pipeline':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-yellow-500" steps={['Build', 'Automated tests', 'Deploy', 'Monitor', 'Rollback']} />
+          <TimelineBoard
+            color="bg-yellow-500"
+            steps={['Build', 'Automated tests', 'Deploy', 'Monitor', 'Rollback']}
+            analogy="Ruta autocarului spre meci: verificare, validare, intrare pe teren și întoarcere rapidă dacă ceva se rupe."
+          />
         </div>
       );
 
@@ -793,6 +886,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Config vs Code + Secrets"
             subtitle="Setări externe, secret management sigur"
             chips={['env config', 'vault', 'no hardcoded secrets', 'least privilege']}
+            analogy="Cheia vestiarului nu se lasă pe poartă; se ține în seif și se dă doar celor care au dreptul real de acces."
             tone="from-indigo-900 via-blue-700 to-indigo-900"
           />
         </div>
@@ -819,6 +913,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="AI Guardrails"
             subtitle="Security, ownership, limitations, verification"
             chips={['Human-in-the-loop', 'Limitations', 'Security checks', 'Ownership', 'Verify output']}
+            analogy="Analistul video propune faza, dar antrenorul decide ce intră pe teren și își asumă scorul final."
             tone="from-fuchsia-900 via-purple-700 to-fuchsia-900"
           />
         </div>
@@ -831,6 +926,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Team Dynamics"
             subtitle="Communication · Questions · Feedback · Collaboration"
             chips={['Clear comms', 'Ask early', 'Feedback loop', 'Pairing']}
+            analogy="Fără comunicare între linii, pasele merg în aut și echipa pierde controlul meciului."
             tone="from-red-900 via-rose-700 to-red-900"
           />
         </div>
@@ -843,6 +939,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Ownership Under Pressure"
             subtitle="Accountability · Learning mindset · Handling failure"
             chips={['Ownership', 'Accountability', 'Pressure handling', 'Failure recovery']}
+            analogy="Nu alergi doar la atac; revii și în apărare când meciul devine greu, apoi corectezi schema după fluierul final."
             tone="from-rose-900 via-orange-700 to-rose-900"
           />
         </div>
@@ -851,7 +948,11 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'time-box':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-rose-500" steps={['Prioritize', 'Plan block', 'Execute', 'Review', 'Adjust']} />
+          <TimelineBoard
+            color="bg-rose-500"
+            steps={['Prioritize', 'Plan block', 'Execute', 'Review', 'Adjust']}
+            analogy="Nu faci trick-uri în propria jumătate când e presiune mare; întâi închizi pericolul, apoi construiești atacul."
+          />
         </div>
       );
 
@@ -861,6 +962,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
           <LayeredSchemaBoard
             title="Decision Schema (Trade-offs)"
             layers={['Context / constraints', 'Options', 'Risks & costs', 'Decision + rationale', 'Follow-up metrics']}
+            analogy="Alegi tactica după adversar și miză, nu după orgoliu; apoi măsori dacă planul chiar a funcționat."
             tone="from-neutral-900 via-slate-700 to-neutral-900"
           />
         </div>
@@ -876,7 +978,11 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'quality-loop':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-slate-500" steps={['Refactor', 'Clean code', 'Docs', 'Measure quality', 'Scale safely']} />
+          <TimelineBoard
+            color="bg-slate-500"
+            steps={['Refactor', 'Clean code', 'Docs', 'Measure quality', 'Scale safely']}
+            analogy="După fiecare meci îți corectezi fazele, nu schimbi toată echipa; progresul vine din reglaje constante."
+          />
         </div>
       );
 
@@ -887,6 +993,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Thinking Out Loud"
             subtitle="Assumptions explicite + validare rapidă"
             chips={['Assumptions', 'Risks', 'Alternatives', 'Decision log']}
+            analogy="Antrenorul explică schema cu voce tare ca fiecare jucător să știe exact rolul înainte de primul fluier."
             tone="from-slate-900 via-zinc-700 to-slate-900"
           />
         </div>
@@ -899,6 +1006,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
             title="Concept Tactic"
             subtitle="Schiță generică disponibilă"
             chips={['Analogie Dinamo', 'Definiție', 'Detalii', 'Repetiție']}
+            analogy="Orice concept nou intră întâi în schema de bază, apoi îl rafinăm ca la pregătirea pentru derby."
           />
         </div>
       );
