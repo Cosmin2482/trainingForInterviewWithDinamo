@@ -35,6 +35,18 @@ type QuestionPhase = {
 
 type ConceptMastery = Record<string, { asked: number; correct: number }>;
 
+type MatchDifficultyPlan = {
+  target: Record<Difficulty, number>;
+  asked: Record<Difficulty, number>;
+};
+
+type MatchStats = {
+  dinamoShots: number;
+  opponentShots: number;
+  dinamoCorners: number;
+  opponentCorners: number;
+};
+
 const DINAMO: Team = {
   id: 'dinamo',
   name: 'Dinamo',
@@ -81,6 +93,48 @@ function randomDifficulty(): Difficulty {
   return 'hard';
 }
 
+function createMatchDifficultyPlan(phase: 'Regular' | 'Playoff' | 'Playout', opponent: Team): MatchDifficultyPlan {
+  const strongOpponent = opponent.attack_strength + opponent.defense_strength >= 162;
+
+  if (phase === 'Playoff') {
+    return {
+      target: strongOpponent ? { easy: 2, medium: 3, hard: 4 } : { easy: 2, medium: 4, hard: 3 },
+      asked: { easy: 0, medium: 0, hard: 0 },
+    };
+  }
+
+  if (phase === 'Playout') {
+    return {
+      target: { easy: 4, medium: 3, hard: 2 },
+      asked: { easy: 0, medium: 0, hard: 0 },
+    };
+  }
+
+  return {
+    target: strongOpponent ? { easy: 3, medium: 3, hard: 3 } : { easy: 4, medium: 3, hard: 2 },
+    asked: { easy: 0, medium: 0, hard: 0 },
+  };
+}
+
+function pickDifficultyForMatch(plan: MatchDifficultyPlan): Difficulty {
+  const deficits: Array<{ difficulty: Difficulty; value: number }> = ['easy', 'medium', 'hard'].map((difficulty) => ({
+    difficulty,
+    value: plan.target[difficulty] - plan.asked[difficulty],
+  }));
+
+  const remaining = deficits.filter((item) => item.value > 0).sort((a, b) => b.value - a.value);
+  if (remaining.length > 0) {
+    return remaining[0].difficulty;
+  }
+
+  return randomDifficulty();
+}
+
+function getFallbackDifficultyOrder(preferred: Difficulty): Difficulty[] {
+  const ordered: Difficulty[] = [preferred, 'medium', 'easy', 'hard'];
+  return [...new Set(ordered)];
+}
+
 function shuffleAnswers(question: Question): string[] {
   return [question.correct_answer, ...question.wrong_answers]
     .filter((answer) => answer && answer.trim().length > 0)
@@ -124,6 +178,18 @@ export function QuizArena() {
   const [goalBanner, setGoalBanner] = useState<'dinamo' | 'opponent' | null>(null);
   const [questionStats, setQuestionStats] = useState<{ poo: number; csharp: number }>({ poo: 0, csharp: 0 });
   const [conceptMastery, setConceptMastery] = useState<ConceptMastery>({});
+  const [matchDifficultyPlan, setMatchDifficultyPlan] = useState<MatchDifficultyPlan>({
+    target: { easy: 4, medium: 3, hard: 2 },
+    asked: { easy: 0, medium: 0, hard: 0 },
+  });
+  const [momentum, setMomentum] = useState(50);
+  const [matchStats, setMatchStats] = useState<MatchStats>({
+    dinamoShots: 0,
+    opponentShots: 0,
+    dinamoCorners: 0,
+    opponentCorners: 0,
+  });
+  const [questionTimeLeft, setQuestionTimeLeft] = useState(0);
 
   const finishedSeason = matchIndex >= schedule.length && (!currentMatch || currentMatch.finished);
 
@@ -142,6 +208,15 @@ export function QuizArena() {
       .slice(0, 5);
   }, [conceptMastery]);
 
+  const weakConcepts = useMemo(() => {
+    return Object.entries(conceptMastery)
+      .filter(([, stats]) => stats.asked >= 2)
+      .map(([concept, stats]) => ({ concept, rate: stats.asked ? stats.correct / stats.asked : 1 }))
+      .sort((a, b) => a.rate - b.rate)
+      .slice(0, 4)
+      .map((item) => item.concept);
+  }, [conceptMastery]);
+
   useEffect(() => {
     void questionService.getQuestionStats().then(setQuestionStats);
   }, []);
@@ -158,6 +233,9 @@ export function QuizArena() {
         opponentGoals: 0,
         finished: false,
       });
+      setMatchDifficultyPlan(createMatchDifficultyPlan(phaseName, fixture.opponent));
+      setMomentum(50);
+      setMatchStats({ dinamoShots: 0, opponentShots: 0, dinamoCorners: 0, opponentCorners: 0 });
       setLogs((prev) => [
         `Meci nou (${phaseName}): ${fixture.dinamoIsHome ? 'Dinamo' : fixture.opponent.name} vs ${fixture.dinamoIsHome ? fixture.opponent.name : 'Dinamo'}`,
         ...prev,
@@ -182,6 +260,26 @@ export function QuizArena() {
     }
   }, [goalBanner]);
 
+  useEffect(() => {
+    if (!questionPhase || selectedAnswer) return;
+
+    const initial = questionPhase.question.difficulty === 'hard' ? 24 : questionPhase.question.difficulty === 'medium' ? 30 : 36;
+    setQuestionTimeLeft(initial);
+
+    const timer = window.setInterval(() => {
+      setQuestionTimeLeft((prev) => {
+        if (prev <= 1) {
+          window.clearInterval(timer);
+          handleAnswer('__timeout__');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [questionPhase, selectedAnswer]);
+
   const applyGoal = (forDinamo: boolean) => {
     setCurrentMatch((prev) => {
       if (!prev) return prev;
@@ -193,50 +291,144 @@ export function QuizArena() {
     });
 
     setGoalBanner(forDinamo ? 'dinamo' : 'opponent');
+    setMomentum((prev) => clamp(prev + (forDinamo ? 14 : -14), 5, 95));
     setLogs((prev) => [forDinamo ? 'GOOOL DINAMO! 🔴⚪' : 'Gol adversar... ⚫', ...prev]);
   };
 
+  const getQuestionByTypeWithFallback = async (
+    type: 'POO' | 'C#',
+    preferred: Difficulty,
+    minute: number,
+  ) => {
+    if (weakConcepts.length > 0 && minute >= 20 && Math.random() < 0.45) {
+      const all = await questionService.getQuestionsByType(type);
+      const targeted = all.filter(
+        (question) => question.difficulty === preferred && weakConcepts.some((concept) => question.conceptTitle.includes(concept)),
+      );
+
+      if (targeted.length > 0) {
+        return targeted[Math.floor(Math.random() * targeted.length)];
+      }
+    }
+
+    for (const difficulty of getFallbackDifficultyOrder(preferred)) {
+      const question = await questionService.getRandomQuestion(type, difficulty);
+      if (question) return question;
+    }
+    return null;
+  };
+
+  const addLiveEvent = (minute: number, opponentName: string, localMomentum: number) => {
+    const roll = Math.random();
+    if (roll > 0.32) return;
+
+    const dinamoFavored = localMomentum >= 55;
+    const dinamoEvent = dinamoFavored ? Math.random() < 0.67 : Math.random() < 0.36;
+
+    if (dinamoEvent) {
+      setMatchStats((prev) => ({
+        ...prev,
+        dinamoShots: prev.dinamoShots + 1,
+        dinamoCorners: prev.dinamoCorners + (Math.random() < 0.35 ? 1 : 0),
+      }));
+
+      setLogs((prev) => [
+        `${minute}' Dinamo pune presiune: șut ${Math.random() < 0.45 ? 'blocat' : 'pe poartă'}!`,
+        ...prev,
+      ]);
+      return;
+    }
+
+    setMatchStats((prev) => ({
+      ...prev,
+      opponentShots: prev.opponentShots + 1,
+      opponentCorners: prev.opponentCorners + (Math.random() < 0.33 ? 1 : 0),
+    }));
+
+    setLogs((prev) => [
+      `${minute}' ${opponentName} câștigă teren: fază periculoasă la poarta lui Dinamo.`,
+      ...prev,
+    ]);
+  };
+
   const maybeCreatePhase = async (minute: number, opponent: Team) => {
-    const dinamoAttackChance = clamp(0.06 + (DINAMO.attack_strength - opponent.defense_strength) / 220, 0.04, 0.2);
-    const opponentAttackChance = clamp(0.06 + (opponent.attack_strength - DINAMO.defense_strength) / 220, 0.04, 0.2);
+    const localMomentum = momentum;
+    const momentumAttackBoost = (localMomentum - 50) / 380;
+    const momentumDefenseBoost = (50 - localMomentum) / 380;
+
+    const dinamoAttackChance = clamp(
+      0.06 + (DINAMO.attack_strength - opponent.defense_strength) / 220 + momentumAttackBoost,
+      0.04,
+      0.24,
+    );
+    const opponentAttackChance = clamp(
+      0.06 + (opponent.attack_strength - DINAMO.defense_strength) / 220 + momentumDefenseBoost,
+      0.04,
+      0.24,
+    );
     const roll = Math.random();
 
+    if (minute % 4 === 0) {
+      addLiveEvent(minute, opponent.name, localMomentum);
+    }
+
     if (roll < dinamoAttackChance) {
-      const difficulty = randomDifficulty();
-      const question = await questionService.getRandomQuestion('POO', difficulty);
+      const difficulty = pickDifficultyForMatch(matchDifficultyPlan);
+      const question = await getQuestionByTypeWithFallback('POO', difficulty, minute);
       if (!question) return;
 
-      const phaseType: PhaseType = difficulty === 'hard' ? 'duel' : 'attack';
+      setMatchDifficultyPlan((prev) => ({
+        ...prev,
+        asked: {
+          ...prev.asked,
+          [question.difficulty]: prev.asked[question.difficulty] + 1,
+        },
+      }));
+
+      const phaseType: PhaseType = question.difficulty === 'hard' ? 'duel' : 'attack';
       setQuestionPhase({ type: phaseType, question, answers: shuffleAnswers(question) });
       setSelectedAnswer(null);
+      setMatchStats((prev) => ({ ...prev, dinamoShots: prev.dinamoShots + 1 }));
       setLogs((prev) => [
         phaseType === 'duel'
-          ? `${minute}' FAZĂ GREA! Duel total: atac + apărare (POO ${difficulty})`
-          : `${minute}' Dinamo atacă! Întrebare POO (${difficulty})`,
+          ? `${minute}' FAZĂ GREA! Duel total: atac + apărare (POO ${question.difficulty})`
+          : `${minute}' Dinamo atacă! Întrebare POO (${question.difficulty})`,
         ...prev,
       ]);
       return;
     }
 
     if (roll < dinamoAttackChance + opponentAttackChance) {
-      const difficulty = randomDifficulty();
-      const question = await questionService.getRandomQuestion('C#', difficulty);
+      const difficulty = pickDifficultyForMatch(matchDifficultyPlan);
+      const question = await getQuestionByTypeWithFallback('C#', difficulty, minute);
       if (!question) return;
 
-      const phaseType: PhaseType = difficulty === 'hard' ? 'duel' : 'defense';
+      setMatchDifficultyPlan((prev) => ({
+        ...prev,
+        asked: {
+          ...prev.asked,
+          [question.difficulty]: prev.asked[question.difficulty] + 1,
+        },
+      }));
+
+      const phaseType: PhaseType = question.difficulty === 'hard' ? 'duel' : 'defense';
       setQuestionPhase({ type: phaseType, question, answers: shuffleAnswers(question) });
       setSelectedAnswer(null);
+      setMatchStats((prev) => ({ ...prev, opponentShots: prev.opponentShots + 1 }));
       setLogs((prev) => [
         phaseType === 'duel'
-          ? `${minute}' FAZĂ GREA! Duel total: atac + apărare (C# ${difficulty})`
-          : `${minute}' ${opponent.name} atacă! Întrebare C# (${difficulty})`,
+          ? `${minute}' FAZĂ GREA! Duel total: atac + apărare (C# ${question.difficulty})`
+          : `${minute}' ${opponent.name} atacă! Întrebare C# (${question.difficulty})`,
         ...prev,
       ]);
       return;
     }
 
     if (minute % 15 === 0) {
-      setLogs((prev) => [`${minute}' Joc de mijloc, fără faze mari.`, ...prev]);
+      setLogs((prev) => [
+        `${minute}' Ritm ${momentum >= 58 ? 'ridicat pentru Dinamo' : momentum <= 42 ? 'favorabil adversarului' : 'echilibrat'}.`,
+        ...prev,
+      ]);
     }
   };
 
@@ -251,6 +443,14 @@ export function QuizArena() {
     }
 
     setCurrentMatch((prev) => (prev ? { ...prev, minute: nextMinute } : prev));
+
+    setMomentum((prev) => {
+      const scoreImpact = currentMatch.dinamoGoals - currentMatch.opponentGoals;
+      const randomSwing = Math.random() < 0.5 ? -1 : 1;
+      const drift = clamp(scoreImpact * 1.2 + randomSwing, -3, 3);
+      return clamp(prev + drift, 5, 95);
+    });
+
     await maybeCreatePhase(nextMinute, currentMatch.opponent);
 
     if (nextMinute === MAX_MINUTE) {
@@ -336,6 +536,7 @@ export function QuizArena() {
 
     setSelectedAnswer(answer);
     const isCorrect = answer === questionPhase.question.correct_answer;
+    const isTimeout = answer === '__timeout__';
     const conceptName = questionPhase.question.conceptTitle;
 
     setConceptMastery((prev) => {
@@ -352,15 +553,22 @@ export function QuizArena() {
     if (questionPhase.type === 'attack') {
       if (isCorrect) {
         applyGoal(true);
+        setMomentum((prev) => clamp(prev + 6, 5, 95));
       } else {
-        setLogs((prev) => ['Ratări în atac: nu se schimbă scorul.', ...prev]);
+        setMomentum((prev) => clamp(prev - 4, 5, 95));
+        setLogs((prev) => [isTimeout ? 'Timp expirat în atac: faza se stinge.' : 'Ratări în atac: nu se schimbă scorul.', ...prev]);
       }
     }
 
     if (questionPhase.type === 'defense') {
       if (isCorrect) {
+        setMomentum((prev) => clamp(prev + 3, 5, 95));
         setLogs((prev) => ['Intervenție salvatoare! Dinamo nu primește gol.', ...prev]);
       } else {
+        setMomentum((prev) => clamp(prev - 6, 5, 95));
+        if (isTimeout) {
+          setLogs((prev) => ['Timp expirat în apărare: adversarul finalizează faza!', ...prev]);
+        }
         applyGoal(false);
       }
     }
@@ -368,8 +576,13 @@ export function QuizArena() {
     if (questionPhase.type === 'duel') {
       if (isCorrect) {
         applyGoal(true);
+        setMomentum((prev) => clamp(prev + 8, 5, 95));
         setLogs((prev) => ['Răspuns greu corect: atac + apărare câștigate!', ...prev]);
       } else {
+        setMomentum((prev) => clamp(prev - 8, 5, 95));
+        if (isTimeout) {
+          setLogs((prev) => ['Timp expirat pe duel: faza grea este pierdută.', ...prev]);
+        }
         applyGoal(false);
         setLogs((prev) => ['Întrebare grea ratată: adversarul lovește!', ...prev]);
       }
@@ -379,6 +592,7 @@ export function QuizArena() {
   const continueAfterQuestion = () => {
     setQuestionPhase(null);
     setSelectedAnswer(null);
+    setQuestionTimeLeft(0);
   };
 
   const goToNextMatch = () => {
@@ -425,6 +639,18 @@ export function QuizArena() {
     setIsRunning(false);
     setGoalBanner(null);
     setConceptMastery({});
+    setMatchDifficultyPlan({
+      target: { easy: 4, medium: 3, hard: 2 },
+      asked: { easy: 0, medium: 0, hard: 0 },
+    });
+    setMomentum(50);
+    setMatchStats({
+      dinamoShots: 0,
+      opponentShots: 0,
+      dinamoCorners: 0,
+      opponentCorners: 0,
+    });
+    setQuestionTimeLeft(0);
     setLogs(['Sezon resetat. Dinamo pornește iar la drum!']);
   };
 
@@ -500,15 +726,75 @@ export function QuizArena() {
 
             {currentMatch ? (
               <>
-                <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
-                  <div className="flex items-center justify-between">
+                <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 relative overflow-hidden">
+                  <motion.div
+                    animate={{ x: ['-20%', '120%'] }}
+                    transition={{ duration: 5.4, repeat: Infinity, ease: 'linear' }}
+                    className="absolute top-1/2 -translate-y-1/2 text-lg opacity-70"
+                  >
+                    ⚽
+                  </motion.div>
+                  <motion.div
+                    animate={{ opacity: [0.16, 0.28, 0.16] }}
+                    transition={{ duration: 2.1, repeat: Infinity }}
+                    className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(239,68,68,0.12)_50%,transparent_100%)] pointer-events-none"
+                  />
+                  <div className="flex items-center justify-between relative z-10">
                     <div className="text-sm font-bold text-neutral-700">{currentMatch.dinamoIsHome ? 'Dinamo' : currentMatch.opponent.name}</div>
-                    <div className="text-2xl font-black text-neutral-900">{currentMatch.dinamoIsHome ? currentMatch.dinamoGoals : currentMatch.opponentGoals} - {currentMatch.dinamoIsHome ? currentMatch.opponentGoals : currentMatch.dinamoGoals}</div>
+                    <motion.div
+                      key={`${currentMatch.dinamoGoals}-${currentMatch.opponentGoals}`}
+                      initial={{ scale: 1.24, opacity: 0.7 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-2xl font-black text-neutral-900"
+                    >
+                      {currentMatch.dinamoIsHome ? currentMatch.dinamoGoals : currentMatch.opponentGoals} - {currentMatch.dinamoIsHome ? currentMatch.opponentGoals : currentMatch.dinamoGoals}
+                    </motion.div>
                     <div className="text-sm font-bold text-neutral-700">{currentMatch.dinamoIsHome ? currentMatch.opponent.name : 'Dinamo'}</div>
                   </div>
-                  <div className="mt-2 flex items-center justify-between text-xs font-bold uppercase text-neutral-500">
+                  <div className="mt-2 flex items-center justify-between text-xs font-bold uppercase text-neutral-500 relative z-10">
                     <span className="inline-flex items-center gap-1"><Timer size={12} /> Min {currentMatch.minute}</span>
                     <span>Meci {matchIndex + 1} / {schedule.length}</span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-red-100 bg-red-50/60 p-3">
+                  <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wide text-red-700 mb-2">
+                    <span>Dificultate per meci</span>
+                    <span>țintă: E/M/H</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-xs font-bold">
+                    <div className="rounded-md bg-white border border-red-200 px-2 py-1.5 text-center text-red-700">
+                      Easy {matchDifficultyPlan.asked.easy}/{matchDifficultyPlan.target.easy}
+                    </div>
+                    <div className="rounded-md bg-white border border-red-200 px-2 py-1.5 text-center text-red-700">
+                      Medium {matchDifficultyPlan.asked.medium}/{matchDifficultyPlan.target.medium}
+                    </div>
+                    <div className="rounded-md bg-white border border-red-200 px-2 py-1.5 text-center text-red-700">
+                      Hard {matchDifficultyPlan.asked.hard}/{matchDifficultyPlan.target.hard}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wide text-neutral-600">
+                    <span>Momentum meci</span>
+                    <span>
+                      {momentum >= 58 ? 'Dinamo domină' : momentum <= 42 ? 'Adversarul domină' : 'Echilibrat'}
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-neutral-200 overflow-hidden">
+                    <motion.div
+                      animate={{ width: `${momentum}%` }}
+                      transition={{ duration: 0.35 }}
+                      className="h-full bg-gradient-to-r from-red-500 to-red-700"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-bold text-neutral-700">
+                    <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">Șuturi Dinamo: {matchStats.dinamoShots}</div>
+                    <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">Șuturi adversar: {matchStats.opponentShots}</div>
+                    <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">Cornere Dinamo: {matchStats.dinamoCorners}</div>
+                    <div className="rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1.5">Cornere adversar: {matchStats.opponentCorners}</div>
                   </div>
                 </div>
 
@@ -571,6 +857,20 @@ export function QuizArena() {
                       </div>
                     </div>
 
+                    <div className="mb-3 rounded-lg border border-red-100 bg-white p-2">
+                      <div className="flex items-center justify-between text-[11px] font-black uppercase text-red-700 mb-1">
+                        <span>Presiune interviu</span>
+                        <span>{questionTimeLeft}s</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-red-100 overflow-hidden">
+                        <motion.div
+                          animate={{ width: `${Math.max(0, Math.min(100, (questionTimeLeft / (questionPhase.question.difficulty === 'hard' ? 24 : questionPhase.question.difficulty === 'medium' ? 30 : 36)) * 100))}%` }}
+                          transition={{ duration: 0.25 }}
+                          className={`h-full ${questionTimeLeft <= 8 ? 'bg-red-600' : questionTimeLeft <= 15 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                        />
+                      </div>
+                    </div>
+
                     <h3 className="text-lg font-black text-neutral-900 mb-2">{questionPhase.question.question}</h3>
                     <p className="text-sm text-neutral-600 mb-3">Concept: {questionPhase.question.conceptTitle}</p>
 
@@ -620,9 +920,15 @@ export function QuizArena() {
                   <p className="text-xs uppercase font-black text-neutral-500 mb-2">Comentariu live</p>
                   <div className="space-y-1 max-h-48 overflow-y-auto">
                     {logs.slice(0, 12).map((line, idx) => (
-                      <p key={`${line}-${idx}`} className="text-sm text-neutral-700 font-medium">
+                      <motion.p
+                        key={`${line}-${idx}`}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-sm text-neutral-700 font-medium"
+                      >
                         {line}
-                      </p>
+                      </motion.p>
                     ))}
                   </div>
                 </div>

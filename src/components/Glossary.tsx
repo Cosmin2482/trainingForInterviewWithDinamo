@@ -1,5 +1,5 @@
 import { CURRICULUM } from '../data/curriculum.ts';
-import { Search, Megaphone } from 'lucide-react';
+import { Search, Megaphone, ClipboardList } from 'lucide-react';
 import { useState } from 'react';
 
 export function Glossary() {
@@ -60,6 +60,22 @@ export function Glossary() {
                       </div>
                       "{concept.analogy}"
                     </div>
+                    {concept.details.length > 0 && (
+                      <div className="mt-4 bg-white p-3 rounded-lg border border-neutral-200">
+                        <div className="flex items-center gap-1 mb-2 text-neutral-700 font-bold text-xs uppercase tracking-wide">
+                          <ClipboardList size={12} />
+                          Puncte cheie
+                        </div>
+                        <ul className="space-y-1.5">
+                          {concept.details.map((detail, detailIdx) => (
+                            <li key={detailIdx} className="text-sm text-neutral-700 flex items-start gap-2">
+                              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-600 flex-shrink-0" />
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

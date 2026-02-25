@@ -37,7 +37,7 @@ export interface CurriculumModule {
   concepts: CurriculumConcept[];
 }
 
-export const CURRICULUM: CurriculumModule[] = [
+const BASE_CURRICULUM: CurriculumModule[] = [
   {
     id: 1,
     title: '1. Fundamente Programare',
@@ -96,7 +96,7 @@ export const CURRICULUM: CurriculumModule[] = [
         details: [
           'Exception vs Error: exception poate fi tratată; error severă poate opri sistemul.',
           'try/catch/finally: control explicit al fluxului la probleme.',
-          'Checked vs unchecked errors (conceptual): unele trebuie declarate/tratate, altele apar implicit.',
+          'Checked vs unchecked context (C#): controlezi dacă overflow-ul aritmetic aruncă excepție sau nu.',
           'Debugging: reproduci bug, izolezi cauza, verifici starea pas cu pas.',
           'Logging: istoric de meci pentru producție; fără loguri e „amintire vagă”.',
           'Breakpoints + Watch/Inspect variables: vezi exact valorile și traseul în call stack.',
@@ -335,7 +335,7 @@ export const CURRICULUM: CurriculumModule[] = [
           'Statelessness: serverul nu păstrează contextul clientului între request-uri.',
           'Beneficii: scalare mai simplă, cache mai bun, mentenanță mai bună.',
         ],
-        visualType: 'rest-grid',
+        visualType: 'angular-formation',
       },
       {
         id: 'frontend-angular',
@@ -348,8 +348,11 @@ export const CURRICULUM: CurriculumModule[] = [
           'TypeScript: tipuri statice care reduc erorile înainte de runtime.',
           'RxJS și fluxuri reactive: utile pentru UI-uri cu date în timp real.',
           'Separarea UI/state/services susține mentenanța în proiecte enterprise.',
+          'HTTP Interceptors: centralizezi auth headers, retry policy și error handling cross-cutting.',
+          'Lazy loading pe feature routes: reduci timpul de încărcare inițial pentru aplicații mari.',
+          'Standalone components (Angular modern): simplifică arhitectura și onboarding-ul proiectului.',
         ],
-        visualType: 'rest-grid',
+        visualType: 'angular-advanced',
       },
       {
         id: 'frontend-angular-advanced',
@@ -364,6 +367,9 @@ export const CURRICULUM: CurriculumModule[] = [
           'Routing guards: controlezi accesul pe rute și fluxuri sensibile.',
           'State management: pattern-uri predictibile pentru aplicații mari.',
           'Testing Angular: unit + integration pentru componente și servicii.',
+          'Unsubscribe discipline: previi memory leaks cu takeUntil/destroy hooks.',
+          'State orchestration: Signals/NgRx în funcție de complexitatea produsului și nevoia de predictibilitate.',
+          'Performance profiling: urmărești rerendering, change detection cost și bundle size înainte de optimizări.',
         ],
         visualType: 'rest-grid',
       },
@@ -388,7 +394,7 @@ export const CURRICULUM: CurriculumModule[] = [
           'Endpoint: URL + metodă pentru o operație.',
           'Routing: maparea request-urilor către endpoint-uri.',
         ],
-        visualType: 'backend-pipeline',
+        visualType: 'kafka-radio',
       },
       {
         id: 'backend-layers',
@@ -633,7 +639,7 @@ export const CURRICULUM: CurriculumModule[] = [
           'Branch / Merge: dezvoltare paralelă și integrare.',
           'Pull Request + Code review: validare colaborativă a schimbărilor.',
         ],
-        visualType: 'git-graph',
+        visualType: 'devops-toolchain',
       },
       {
         id: 'cicd-core',
@@ -723,7 +729,7 @@ export const CURRICULUM: CurriculumModule[] = [
           'Boilerplate generation: economisești timp pe cod repetitiv.',
           'Refactoring with AI: sugestii de restructurare.',
         ],
-        visualType: 'ai-loop',
+        visualType: 'mcp-map',
       },
       {
         id: 'ai-governance',
@@ -735,6 +741,8 @@ export const CURRICULUM: CurriculumModule[] = [
           'AI for documentation: draft rapid de explicații.',
           'AI for debugging: ipoteze și pași de investigare.',
           'AI for learning concepts: exemple și analogii.',
+          'Tooling practic: GitHub Copilot / CodeWhisperer pentru autocomplete, scaffolding și refactor sigur.',
+          'Tooling de research: NotebookLM / Claude / OpenAI pentru sinteze tehnice și clarificare trade-off-uri.',
           'Human-in-the-loop: decizia finală rămâne la om.',
           'AI limitations: halucinații, context incomplet, inconsistență.',
           'Security concerns: risc de expunere date/secrete.',
@@ -753,9 +761,10 @@ export const CURRICULUM: CurriculumModule[] = [
           'Model Context Protocol: conectezi tool-uri și date într-un mod standardizat.',
           'Agentic workflows (ex. n8n): lanțuri de task-uri automate cu verificare umană.',
           'Prompt quality: claritate, context, constrângeri, criterii de acceptare.',
+          'Exemplu flux enterprise: ticket Jira -> plan AI -> cod + teste -> PR review -> rollout controlat.',
           'Măsurare impact AI: lead time, defect rate, PR throughput, calitatea review-ului.',
         ],
-        visualType: 'ai-loop',
+        visualType: 'mcp-map',
       },
     ],
   },
@@ -838,7 +847,7 @@ export const CURRICULUM: CurriculumModule[] = [
           'Readability vs performance: optimizezi unde doare, păstrezi claritatea implicit.',
           'Simplicity vs over-engineering: construiești minimul robust.',
         ],
-        visualType: 'meta-tradeoffs',
+        visualType: 'construction-impact',
       },
       {
         id: 'meta-sustainability',
@@ -883,6 +892,275 @@ export const CURRICULUM: CurriculumModule[] = [
         ],
         visualType: 'meta-tradeoffs',
       },
+      {
+        id: 'role-baseline-checklist',
+        title: 'Role baseline checklist: fit pe cerințe, ownership și impact',
+        content: 'Traduci JD-ul în comportamente și rezultate măsurabile, nu doar în buzzwords.',
+        analogy:
+          'E ca verificarea lotului înainte de derby: nu ajunge să ai talent, trebuie să ai condiție, disciplină, execuție și comunicare cu tot staff-ul.',
+        details: [
+          'Foundational fit: bachelor în CS/SE (sau echivalent), minim 3 ani experiență pe aplicații enterprise livrate.',
+          'Core stack: .NET/C#, Web API, SQL + NoSQL, front-end modern (Angular/TypeScript preferat).',
+          'AI maturity: folosești Copilot/CodeWhisperer/n8n/NotebookLM/Claude/OpenAI/MCP cu verificare umană strictă.',
+          'Own the lifecycle: requirements analysis, design, implementare, testare, deployment, performance tuning.',
+          'Cross-team impact: colaborare activă cu PM, QA și engineering pentru release-uri intuitive, eficiente și stabile.',
+          'Preferred edge: context în software pentru construcții, white-box testing, mentoring și promovarea practicilor moderne.',
+        ],
+        visualType: 'construction-impact',
+      },
     ],
   },
 ];
+
+const GLOBAL_ADVANCED_LINES = [
+  'Interview lens: explică întâi principiul, apoi exemplul concret, apoi trade-off-ul.',
+  'Red flag de evitat: soluții absolute fără context („mereu”, „niciodată”).',
+  'Practice scurt: leagă conceptul de un bug real sau de un incident de producție.',
+];
+
+const MODULE_ADVANCED_LINES: Record<number, string[]> = {
+  1: [
+    'Diagnostic workflow: reproduce → isolate root cause → fix minim → regression test.',
+    'Prioritizează claritatea mesajelor de eroare pentru debugging rapid în echipă.',
+  ],
+  2: [
+    'Pentru interviu, compară mereu două opțiuni OOP cu argumente pro/contra.',
+    'Design-ul bun maximizează extensibilitatea fără a crește complexitatea accidentală.',
+  ],
+  3: [
+    'Arată un exemplu de cod care încalcă principiul și un refactor minim care îl repară.',
+    'Leagă SOLID de testabilitate și de viteza de schimbare pe termen lung.',
+  ],
+  4: [
+    'Pattern-ul e util doar dacă simplifică problema reală, nu pentru „colecție de pattern-uri”.',
+    'În interviu, spune clar semnalul care îți indică momentul potrivit pentru acel pattern.',
+  ],
+  5: [
+    'Definește ce verifică testul, ce nu verifică și ce risc acoperă efectiv.',
+    'Preferă teste stabile și utile business, nu doar coverage mare.',
+  ],
+  6: [
+    'Pentru fiecare endpoint, explică semantic method + status code + idempotency.',
+    'Contractul API trebuie să fie predictibil și documentat clar pentru consumatori.',
+  ],
+  7: [
+    'Separă clar responsabilitatea pe straturi: intrare, business, persistență, cross-cutting.',
+    'Leagă fiecare alegere de operare reală: observability, rollback, debugging în producție.',
+  ],
+  8: [
+    'Explică design schema + query strategy + indexing ca un tot unitar.',
+    'În interviu, discută și despre costul scrierilor, nu doar al citirilor.',
+  ],
+  9: [
+    'Argumentează NoSQL după pattern de acces, nu după popularitate tehnologică.',
+    'Menționează explicit compromisurile de consistență și modelează-le pe cazuri reale.',
+  ],
+  10: [
+    'Clarifică diferența dintre concurență, paralelism și asincronie în răspunsurile tale.',
+    'Explică prevenția pentru race/deadlock înainte de implementarea propriu-zisă.',
+  ],
+  11: [
+    'Leagă alegerea structurii de date de complexitate și de profilul real al inputului.',
+    'Arată cum tratezi edge cases fără a complica inutil soluția.',
+  ],
+  12: [
+    'CI/CD bun = feedback rapid, release predictibil, rollback sigur și metrici clare.',
+    'În interviu, descrie pipeline-ul ca produs de engineering, nu doar ca listă de tool-uri.',
+  ],
+  13: [
+    'Leagă cloud choices de responsabilități operaționale și cost total de ownership.',
+    'Explică security baseline: secrets, identity, least privilege, auditability.',
+  ],
+  14: [
+    'Human-in-the-loop: AI propune, inginerul validează, echipa își asumă ownership total.',
+    'Măsoară impactul AI prin lead time, defect rate și calitatea review-ului.',
+  ],
+  15: [
+    'Comunicarea bună include context, decizie, risc, alternativă și next step clar.',
+    'În situații tensionate, prioritizează transparența și blame-free problem solving.',
+  ],
+  16: [
+    'Meta-skill: justifici deciziile tehnice cu context și metrici, nu doar preferințe personale.',
+    'Alege simplitatea robustă și plătește technical debt în ferestre planificate.',
+  ],
+};
+
+const ADVANCED_DETAILS_BY_CONCEPT: Record<string, string[]> = {
+  'errors-core': [
+    'Mapează fiecare eroare la etapa de detectare: IDE, build, runtime monitoring.',
+    'Pentru logical errors, scrie test de proprietate sau caz de frontieră care reproduce bug-ul.',
+  ],
+  'memory-core': [
+    'Explică efectul copiei vs referinței asupra mutabilității și bug-urilor subtile.',
+    'Call stack + heap snapshots sunt complementare în investigații de performanță.',
+  ],
+  'garbage-collection': [
+    'Diferențiază memory leak real de memory growth temporar în workload-uri bursty.',
+    'Optimizează allocation hotspots înainte de optimizări micro premature.',
+  ],
+  'exceptions-debug': [
+    'Alege ce excepții tratezi local și ce lași să urce spre boundary handlers.',
+    'Logurile trebuie să includă correlation id, context tehnic și impact business.',
+  ],
+  'oop-basics': [
+    'Definește invariants în constructor pentru a preveni obiecte în stare invalidă.',
+  ],
+  'oop-principles': [
+    'Arată când inheritance devine rigid și cum composition reduce coupling-ul structural.',
+  ],
+  'oop-architecture': [
+    'Contractele bune sunt mici, explicite și testabile, evitând dependențe circulare.',
+  ],
+  'solid-full': [
+    'În review, verifică explicit dacă fiecare principiu SOLID aduce claritate sau doar ceremonie.',
+  ],
+  'patterns-creational': [
+    'Compară Builder vs telescoping constructors pe lizibilitate și validare incrementală.',
+  ],
+  'patterns-behavior-struct': [
+    'Leagă pattern-urile de use-case-uri reale, nu de definiții izolate.',
+  ],
+  'anti-patterns': [
+    'Semn timpuriu: creștere mare a timpului de onboarding și regresii la schimbări mici.',
+  ],
+  'testing-types': [
+    'Descrie clar ce nivel de test detectează cel mai devreme un anumit defect.',
+  ],
+  'testing-techniques': [
+    'Mock unde verifici colaborarea; fake unde vrei comportament apropiat de real.',
+  ],
+  'testing-strategy': [
+    'Optimizează suitele pentru feedback rapid local și validare robustă în CI.',
+  ],
+  'http-architecture': [
+    'Contractele HTTP bune separă semantic payload-ul de metadata și policy headers.',
+  ],
+  'http-methods-status': [
+    'Status code corect reduce ambiguitatea la integrarea dintre echipe și servicii.',
+  ],
+  'rest-principles': [
+    'Statelessness + idempotency simplifică retry logic și crește reziliența sistemului.',
+  ],
+  'frontend-angular': [
+    'Leagă component boundaries de ownership-ul echipei și de testabilitatea UI.',
+    'Descrie clar strategia de routing, lazy loading și interceptors pentru aplicații enterprise.',
+  ],
+  'frontend-angular-advanced': [
+    'OnPush + immutable state reduc rerendering inutil și bug-uri de sincronizare.',
+    'Explică când alegi Signals vs NgRx și ce cost de complexitate accepți pentru fiecare.',
+    'Leagă testarea de risc: guards/forms/interceptors au impact direct pe experiența utilizatorului.',
+  ],
+  'backend-core': [
+    'Controller-ul ideal orchestrează, dar decizia de business rămâne în servicii.',
+  ],
+  'backend-layers': [
+    'Definește contracte între straturi astfel încât schimbările interne să nu rupă API-ul.',
+  ],
+  'backend-di-config': [
+    'Alege lifetime-ul dependențelor în funcție de stare, thread safety și cost de creare.',
+  ],
+  'backend-dotnet-kafka': [
+    'Event-driven design cere idempotency și handling clar pentru duplicate/out-of-order events.',
+  ],
+  'sql-entities': [
+    'Indexing-ul eficient pornește din query plan, nu din presupuneri.',
+  ],
+  'sql-normalization-joins': [
+    'Balance normalize/denormalize după pattern-ul dominant de citire/scriere.',
+  ],
+  'sql-transactions': [
+    'Izolarea tranzacțiilor e un compromis între consistență și throughput.',
+  ],
+  'nosql-core': [
+    'Schema-less nu înseamnă schema-free: validează contractele la boundary.',
+  ],
+  'nosql-choices': [
+    'Alegerea SQL/NoSQL trebuie justificată cu volum, latență și evoluția domeniului.',
+  ],
+  'async-basics': [
+    'Evită blocarea sincronă peste async pentru a preveni starvation și deadlock-uri.',
+  ],
+  'async-risks': [
+    'Thread safety cere model clar de ownership pe stare partajată.',
+  ],
+  'structures-control': [
+    'Alegerea structurii de date este decizie de performanță și de claritate simultan.',
+  ],
+  'complexity-performance': [
+    'Optimizarea utilă pornește din profiling și metrici, nu din estimări speculative.',
+  ],
+  'edge-quality': [
+    'Validează devreme și întoarce erori explicite pentru a scurta timpul de triage.',
+  ],
+  'git-flow': [
+    'Commits mici și coezive simplifică review-ul și revert-ul în incidente.',
+  ],
+  'cicd-core': [
+    'Pipelines robuste includ quality gates și observability post-deploy.',
+  ],
+  'devops-toolchain': [
+    'Tooling-ul servește procesul; procesul clar bate orice „stack” sofisticat.',
+  ],
+  'cloud-foundation': [
+    'Scalability fără observability produce cost mare și diagnostic lent.',
+  ],
+  'cloud-config-secrets': [
+    'Rotatează secretele și limitează accesul prin least privilege + audit trails.',
+  ],
+  'ai-usage': [
+    'Folosește AI pe unități mici de lucru pentru control mai bun al calității.',
+  ],
+  'ai-governance': [
+    'Verificarea output-ului AI trebuie să fie reproducibilă prin teste și review.',
+  ],
+  'ai-mcp-agentic': [
+    'Agentic workflows eficiente au roluri clare, guardrails și criterii de acceptare.',
+  ],
+  'soft-teamwork': [
+    'Feedback-ul eficient este specific, observabil și orientat pe comportament, nu persoană.',
+  ],
+  'soft-ownership': [
+    'Ownership înseamnă și comunicarea timpurie a riscurilor, nu doar execuția task-ului.',
+  ],
+  'soft-prioritization': [
+    'Prioritizează după impact business și risc tehnic, nu doar după zgomotul din jur.',
+  ],
+  'soft-mentoring': [
+    'Mentoring-ul bun crește autonomia colegilor, nu dependența de „expert”.',
+  ],
+  'meta-tradeoffs': [
+    'Documentează explicit de ce ai ales o variantă și ce semnal ar declanșa re-evaluarea.',
+  ],
+  'meta-sustainability': [
+    'Calitatea pe termen lung cere disciplină incrementală, nu refactor-uri „big bang”.',
+  ],
+  'meta-thinking': [
+    'Thinking out loud bun include ipoteze, risc, alternativă și criteriu de decizie.',
+  ],
+  'construction-domain-impact': [
+    'Leagă deciziile tehnice de impact operațional real pentru utilizatorul final.',
+  ],
+  'role-baseline-checklist': [
+    'Explică în interviu cum transformi cerințele rolului în metrici concrete: lead time, defect rate, uptime, adopție feature.',
+    'Demonstrează fit-ul prin exemple livrate cap-coadă și rezultate observabile în echipă/produs.',
+  ],
+};
+
+function uniqueDetails(lines: string[]): string[] {
+  return [...new Set(lines.map((line) => line.trim()).filter(Boolean))];
+}
+
+function expandDetails(moduleId: number, concept: CurriculumConcept): string[] {
+  const moduleLines = MODULE_ADVANCED_LINES[moduleId] ?? [];
+  const conceptLines = ADVANCED_DETAILS_BY_CONCEPT[concept.id] ?? [];
+
+  return uniqueDetails([...concept.details, ...conceptLines, ...moduleLines, ...GLOBAL_ADVANCED_LINES]);
+}
+
+export const CURRICULUM: CurriculumModule[] = BASE_CURRICULUM.map((module) => ({
+  ...module,
+  concepts: module.concepts.map((concept) => ({
+    ...concept,
+    details: expandDetails(module.id, concept),
+  })),
+}));

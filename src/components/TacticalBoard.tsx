@@ -83,6 +83,244 @@ function TimelineBoard({ steps, color }: { steps: string[]; color: string }) {
   );
 }
 
+function LayeredSchemaBoard({
+  title,
+  layers,
+  tone = 'from-slate-900 via-slate-800 to-slate-900',
+}: {
+  title: string;
+  layers: string[];
+  tone?: string;
+}) {
+  return (
+    <div className={`w-full h-52 rounded-xl bg-gradient-to-br ${tone} border border-white/20 p-3 overflow-hidden`}>
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">{title}</p>
+      <div className="relative h-[calc(100%-22px)]">
+        {layers.map((layer, index) => {
+          const top = 8 + index * 38;
+          return (
+            <React.Fragment key={layer}>
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="absolute left-3 right-3 rounded-md border border-white/30 bg-white/10 text-white text-[11px] font-bold px-3 py-2"
+                style={{ top }}
+              >
+                {layer}
+              </motion.div>
+              {index < layers.length - 1 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0.35, 0.8, 0.35] }}
+                  transition={{ repeat: Infinity, duration: 1.6, delay: index * 0.2 }}
+                  className="absolute left-1/2 -translate-x-1/2 text-white/80 text-sm"
+                  style={{ top: top + 28 }}
+                >
+                  ↓
+                </motion.div>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function JoinVennBoard() {
+  return (
+    <div className="w-full h-52 rounded-xl bg-neutral-900 border border-neutral-700 p-3 overflow-hidden relative">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">JOIN Schema (SQL)</p>
+      <div className="relative h-[calc(100%-22px)]">
+        <motion.div
+          animate={{ x: [0, -2, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity }}
+          className="absolute w-24 h-24 rounded-full bg-cyan-500/45 border border-cyan-300 left-[26%] top-[26%]"
+        />
+        <motion.div
+          animate={{ x: [0, 2, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity }}
+          className="absolute w-24 h-24 rounded-full bg-emerald-500/45 border border-emerald-300 left-[44%] top-[26%]"
+        />
+        <div className="absolute left-[30%] top-[18%] text-[10px] font-black text-cyan-200 uppercase">Users</div>
+        <div className="absolute left-[54%] top-[18%] text-[10px] font-black text-emerald-200 uppercase">Orders</div>
+        <div className="absolute left-[46%] top-[42%] text-[10px] font-black text-white uppercase">Inner</div>
+        <div className="absolute left-[16%] bottom-[8%] text-[10px] font-bold text-cyan-200">LEFT = tot Users + match</div>
+        <div className="absolute right-[8%] bottom-[8%] text-[10px] font-bold text-emerald-200 text-right">RIGHT = tot Orders + match</div>
+      </div>
+    </div>
+  );
+}
+
+function CloudStackBoard() {
+  return (
+    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-sky-900 via-blue-800 to-sky-900 border border-white/20 p-3 overflow-hidden">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Cloud Service Models</p>
+      <div className="relative h-[calc(100%-22px)]">
+        <div className="absolute inset-x-4 bottom-1 h-8 rounded-md bg-slate-900/70 border border-white/20 text-[11px] text-white font-bold flex items-center justify-center">
+          IaaS — VM/Network/Storage control
+        </div>
+        <div className="absolute inset-x-8 bottom-11 h-8 rounded-md bg-blue-700/70 border border-white/20 text-[11px] text-white font-bold flex items-center justify-center">
+          PaaS — focus pe cod, nu pe server ops
+        </div>
+        <div className="absolute inset-x-12 bottom-[84px] h-8 rounded-md bg-cyan-600/75 border border-white/20 text-[11px] text-white font-bold flex items-center justify-center">
+          SaaS — consumi produsul final
+        </div>
+        <div className="absolute right-3 top-2 text-[10px] text-white/90 font-bold uppercase">Dinamo scale mode ⚽</div>
+      </div>
+    </div>
+  );
+}
+
+function LoopBoard({ title, nodes }: { title: string; nodes: string[] }) {
+  return (
+    <div className="w-full h-52 rounded-xl bg-neutral-900 border border-neutral-700 p-3 overflow-hidden">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">{title}</p>
+      <div className="relative h-[calc(100%-22px)]">
+        {nodes.map((node, index) => {
+          const angle = (index / nodes.length) * Math.PI * 2;
+          const left = 50 + Math.cos(angle) * 28;
+          const top = 50 + Math.sin(angle) * 28;
+
+          return (
+            <motion.div
+              key={node}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: [1, 1.04, 1] }}
+              transition={{ delay: index * 0.08, duration: 1.8, repeat: Infinity }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-md border border-white/20 bg-white/10 text-white text-[10px] font-bold px-2 py-1"
+              style={{ left: `${left}%`, top: `${top}%` }}
+            >
+              {node}
+            </motion.div>
+          );
+        })}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/80 text-lg"
+        >
+          ↻
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function AngularBoard({ advanced = false }: { advanced?: boolean }) {
+  return (
+    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-red-900 via-rose-800 to-red-900 border border-white/20 p-3 overflow-hidden">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">
+        {advanced ? 'Angular Advanced Match Plan' : 'Angular Team Formation'}
+      </p>
+      <div className="relative h-[calc(100%-22px)]">
+        <div className="absolute left-3 right-3 top-2 rounded-md border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase">
+          App Shell + Routing Guards
+        </div>
+        <div className="absolute left-3 w-[45%] top-14 rounded-md border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase">
+          Components (UI)
+        </div>
+        <div className="absolute right-3 w-[45%] top-14 rounded-md border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase">
+          Services (Logic)
+        </div>
+        <div className="absolute left-3 right-3 top-26 rounded-md border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase">
+          State + RxJS Streams
+        </div>
+        <div className="absolute left-3 right-3 bottom-2 rounded-md border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase">
+          API + DTO Contracts
+        </div>
+
+        <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7 }} className="absolute left-1/2 -translate-x-1/2 top-9 text-white/80 text-xs">↓</motion.div>
+        <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.2 }} className="absolute left-[27%] top-20 text-white/80 text-xs">↓</motion.div>
+        <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.35 }} className="absolute right-[27%] top-20 text-white/80 text-xs">↓</motion.div>
+        <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.5 }} className="absolute left-1/2 -translate-x-1/2 top-32 text-white/80 text-xs">↓</motion.div>
+        {advanced && (
+          <div className="absolute right-2 top-1 text-[9px] font-black uppercase text-amber-200 bg-black/30 border border-white/20 rounded px-1.5 py-0.5">
+            OnPush + Perf
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function KafkaFlowBoard() {
+  return (
+    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-violet-900 via-purple-800 to-violet-900 border border-white/20 p-3 overflow-hidden">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Event-Driven (Kafka) Match Radio</p>
+      <div className="relative h-[calc(100%-22px)]">
+        <div className="absolute left-2 top-12 w-[28%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">API Producer</div>
+        <div className="absolute left-[36%] top-6 w-[28%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Kafka Topic</div>
+        <div className="absolute right-2 top-12 w-[28%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Consumer Service</div>
+        <div className="absolute left-[36%] bottom-4 w-[28%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Offsets / Replay</div>
+
+        <motion.div animate={{ x: [0, 8, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.4 }} className="absolute left-[31%] top-14 text-white">→</motion.div>
+        <motion.div animate={{ x: [0, 8, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.4, delay: 0.3 }} className="absolute left-[65%] top-14 text-white">→</motion.div>
+        <motion.div animate={{ y: [0, 6, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.6, delay: 0.2 }} className="absolute left-1/2 -translate-x-1/2 top-16 text-white">↓</motion.div>
+      </div>
+    </div>
+  );
+}
+
+function DevOpsToolchainBoard() {
+  return (
+    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-amber-900 via-orange-800 to-amber-900 border border-white/20 p-3 overflow-hidden">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Toolchain Delivery Line</p>
+      <div className="relative h-[calc(100%-22px)]">
+        {['Bitbucket/GitHub', 'Bamboo CI', 'Spinnaker CD', 'Jira Tracking'].map((item, idx) => (
+          <motion.div
+            key={item}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className="absolute rounded-md border border-white/25 bg-white/10 text-white text-[10px] font-bold uppercase px-2 py-1"
+            style={{ left: `${6 + idx * 23}%`, top: `${idx % 2 === 0 ? 18 : 50}%` }}
+          >
+            {item}
+          </motion.div>
+        ))}
+        <motion.div animate={{ x: [0, 78, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 2.8 }} className="absolute left-8 bottom-3 text-white">⚽➡</motion.div>
+      </div>
+    </div>
+  );
+}
+
+function MCPBoard() {
+  return (
+    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-fuchsia-900 via-purple-800 to-fuchsia-900 border border-white/20 p-3 overflow-hidden">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">MCP + Agentic Workflow</p>
+      <div className="relative h-[calc(100%-22px)]">
+        <div className="absolute left-2 top-8 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Developer Prompt</div>
+        <div className="absolute left-[35%] top-2 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">MCP Context Hub</div>
+        <div className="absolute right-2 top-8 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Agents/Tools</div>
+        <div className="absolute left-[35%] bottom-6 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Human Verification</div>
+
+        <motion.div animate={{ x: [0, 8, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.4 }} className="absolute left-[31%] top-10 text-white">→</motion.div>
+        <motion.div animate={{ x: [0, 8, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.4, delay: 0.2 }} className="absolute left-[67%] top-10 text-white">→</motion.div>
+        <motion.div animate={{ y: [0, 6, 0], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.4 }} className="absolute left-1/2 -translate-x-1/2 top-16 text-white">↓</motion.div>
+      </div>
+    </div>
+  );
+}
+
+function ConstructionImpactBoard() {
+  return (
+    <div className="w-full h-52 rounded-xl bg-gradient-to-br from-slate-900 via-stone-800 to-slate-900 border border-white/20 p-3 overflow-hidden">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/90 mb-2">Construction Domain Impact</p>
+      <div className="relative h-[calc(100%-22px)]">
+        <div className="absolute left-2 top-6 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Site Data</div>
+        <div className="absolute left-[35%] top-6 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">API + Rules</div>
+        <div className="absolute right-2 top-6 w-[30%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1">Field UI</div>
+        <div className="absolute left-[20%] bottom-8 w-[60%] rounded-md bg-white/10 border border-white/25 text-white text-[10px] font-bold uppercase px-2 py-1 text-center">Fewer errors • Faster decisions • Real-world value</div>
+        <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.6 }} className="absolute left-[30%] top-10 text-white">→</motion.div>
+        <motion.div animate={{ opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.6, delay: 0.2 }} className="absolute left-[66%] top-10 text-white">→</motion.div>
+        <motion.div animate={{ y: [0, 6, 0], opacity: [0.35, 1, 0.35] }} transition={{ repeat: Infinity, duration: 1.7, delay: 0.3 }} className="absolute left-1/2 -translate-x-1/2 top-16 text-white">↓</motion.div>
+      </div>
+    </div>
+  );
+}
+
 export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
   switch (type) {
     case 'error-types':
@@ -226,10 +464,14 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'oop-relations':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <GenericBoard
-            title="Encapsulation · Abstraction · Inheritance · Polymorphism"
-            subtitle="4 piloni OOP pe aceeași tablă tactică"
-            chips={['private/public', 'abstract', 'is-a', 'override', 'overload', 'virtual']}
+          <LayeredSchemaBoard
+            title="OOP Schema — de la concept la execuție"
+            layers={[
+              'Encapsulation (boundary/API) ',
+              'Abstraction (contract) ',
+              'Inheritance / Composition (structură) ',
+              'Polymorphism (runtime behavior) ',
+            ]}
             tone="from-indigo-900 via-indigo-700 to-slate-800"
           />
         </div>
@@ -365,6 +607,20 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
         </div>
       );
 
+    case 'angular-formation':
+      return (
+        <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
+          <AngularBoard />
+        </div>
+      );
+
+    case 'angular-advanced':
+      return (
+        <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
+          <AngularBoard advanced />
+        </div>
+      );
+
     case 'backend-pipeline':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
@@ -372,13 +628,19 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
         </div>
       );
 
+    case 'kafka-radio':
+      return (
+        <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
+          <KafkaFlowBoard />
+        </div>
+      );
+
     case 'backend-layers':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <GenericBoard
-            title="Backend Layers"
-            subtitle="DTO · Model · Service · Repository · Middleware · Filters"
-            chips={['DTO', 'Model', 'Service', 'Repository', 'Middleware', 'Filters']}
+          <LayeredSchemaBoard
+            title="Backend Architecture Schema"
+            layers={['Middleware/Filters', 'Controller + DTO', 'Service Layer', 'Repository Layer', 'DB/External systems']}
             tone="from-fuchsia-900 via-violet-700 to-fuchsia-900"
           />
         </div>
@@ -411,12 +673,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'sql-joins':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <GenericBoard
-            title="JOIN Arena"
-            subtitle="INNER · LEFT · RIGHT + Normalization/Pagination"
-            chips={['INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'Normalization', 'Denormalization', 'Pagination']}
-            tone="from-emerald-900 via-green-700 to-emerald-900"
-          />
+          <JoinVennBoard />
         </div>
       );
 
@@ -508,6 +765,13 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
         </div>
       );
 
+    case 'devops-toolchain':
+      return (
+        <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
+          <DevOpsToolchainBoard />
+        </div>
+      );
+
     case 'devops-pipeline':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
@@ -518,12 +782,7 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'cloud-stack':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <GenericBoard
-            title="Cloud Layers"
-            subtitle="IaaS · PaaS · SaaS + Hosting/Scalability/Availability"
-            chips={['IaaS', 'PaaS', 'SaaS', 'Hosting', 'Scalability', 'Availability']}
-            tone="from-sky-900 via-blue-700 to-sky-900"
-          />
+          <CloudStackBoard />
         </div>
       );
 
@@ -542,7 +801,14 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'ai-loop':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <TimelineBoard color="bg-fuchsia-500" steps={['Prompt', 'Code generation', 'Refactor suggestion', 'Human review', 'Tests']} />
+          <LoopBoard title="AI Dev Loop (Human-in-the-loop)" nodes={['Prompt', 'Generate', 'Review', 'Test', 'Refine']} />
+        </div>
+      );
+
+    case 'mcp-map':
+      return (
+        <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
+          <MCPBoard />
         </div>
       );
 
@@ -592,12 +858,18 @@ export const TacticalBoard: React.FC<TacticalBoardProps> = ({ type }) => {
     case 'meta-tradeoffs':
       return (
         <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
-          <GenericBoard
-            title="Meta Trade-offs"
-            subtitle="Readability vs performance · simplicity vs over-engineering"
-            chips={['Trade-offs', 'Context first', 'Simplicity', 'Performance hotspots']}
+          <LayeredSchemaBoard
+            title="Decision Schema (Trade-offs)"
+            layers={['Context / constraints', 'Options', 'Risks & costs', 'Decision + rationale', 'Follow-up metrics']}
             tone="from-neutral-900 via-slate-700 to-neutral-900"
           />
+        </div>
+      );
+
+    case 'construction-impact':
+      return (
+        <div className="w-full my-4 rounded-xl overflow-hidden shadow-inner bg-white">
+          <ConstructionImpactBoard />
         </div>
       );
 
